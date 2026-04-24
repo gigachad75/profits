@@ -16,16 +16,21 @@ app.use(express.static(path.join(__dirname)));
 
 // ✅ MongoDB Connect
 mongoose.connect(process.env.MONGO_URI, {
-  serverSelectionTimeoutMS: 5000 // 5 second me fail ho jaye agar connect na ho
+  serverSelectionTimeoutMS: 5000 // 5 seconds timeout
 })
-.then(() => console.log("✅ MongoDB Connected successfully to Atlas!"))
-.catch((err) => {
-  console.log("❌ MongoDB Connection Initial Error:", err.message);
+  .then(() => console.log("✅ MongoDB Connected Successfully!"))
+  .catch((err) => {
+    console.error("❌ MongoDB Initial Connection Error:", err.message);
+    console.error("Full Error details:", err);
+  });
+
+// Runtime connection errors
+mongoose.connection.on('error', err => {
+  console.error('❌ Mongoose connection lost:', err);
 });
 
-// Connection state check karne ke liye
-mongoose.connection.on('error', err => {
-  console.log('❌ Mongoose runtime error:', err);
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️ Mongoose disconnected');
 });
 
 // ✅ Routes
