@@ -15,9 +15,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
 // ✅ MongoDB Connect
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected!"))
-  .catch((err) => console.log("❌ MongoDB Error:", err));
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000 // 5 second me fail ho jaye agar connect na ho
+})
+.then(() => console.log("✅ MongoDB Connected successfully to Atlas!"))
+.catch((err) => {
+  console.log("❌ MongoDB Connection Initial Error:", err.message);
+});
+
+// Connection state check karne ke liye
+mongoose.connection.on('error', err => {
+  console.log('❌ Mongoose runtime error:', err);
+});
 
 // ✅ Routes
 const authRoutes = require("./routes/auth");
